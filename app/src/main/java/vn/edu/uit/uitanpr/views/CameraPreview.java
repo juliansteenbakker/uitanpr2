@@ -8,8 +8,15 @@ import android.graphics.ImageFormat;
 import android.hardware.Camera;
 import android.hardware.Camera.Size;
 
+import android.view.Display;
+import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+import android.view.WindowManager;
+
+import static android.R.attr.width;
+import static android.content.Context.WINDOW_SERVICE;
+import static vn.edu.uit.uitanpr.R.attr.height;
 
 public class CameraPreview extends SurfaceView implements
 		SurfaceHolder.Callback {
@@ -52,32 +59,31 @@ public class CameraPreview extends SurfaceView implements
 		mCamera = null;
 	}
 
-	private Size getOptimalPreviewSize(List<Size> sizes, int w, int h) {
+	private Camera.Size getOptimalPreviewSize(List<Camera.Size> sizes, int w, int h) {
 		final double ASPECT_TOLERANCE = 0.05;
-		double targetRatio = (double) w / h;
-		if (sizes == null)
-			return null;
+		double targetRatio = (double) w/h;
 
-		Size optimalSize = null;
+		if (sizes==null) return null;
+
+		Camera.Size optimalSize = null;
+
 		double minDiff = Double.MAX_VALUE;
 
 		int targetHeight = h;
 
-		// Try to find an size match aspect ratio and size
-		for (Size size : sizes) {
+		// Find size
+		for (Camera.Size size : sizes) {
 			double ratio = (double) size.width / size.height;
-			if (Math.abs(ratio - targetRatio) > ASPECT_TOLERANCE)
-				continue;
+			if (Math.abs(ratio - targetRatio) > ASPECT_TOLERANCE) continue;
 			if (Math.abs(size.height - targetHeight) < minDiff) {
 				optimalSize = size;
 				minDiff = Math.abs(size.height - targetHeight);
 			}
 		}
 
-		// Cannot find the one match the aspect ratio, ignore the requirement
 		if (optimalSize == null) {
 			minDiff = Double.MAX_VALUE;
-			for (Size size : sizes) {
+			for (Camera.Size size : sizes) {
 				if (Math.abs(size.height - targetHeight) < minDiff) {
 					optimalSize = size;
 					minDiff = Math.abs(size.height - targetHeight);
@@ -92,8 +98,9 @@ public class CameraPreview extends SurfaceView implements
 		// the preview.
 		Camera.Parameters parameters = mCamera.getParameters();
 
-		List<Size> sizes = parameters.getSupportedPreviewSizes();
-		Size optimalSize = getOptimalPreviewSize(sizes, w, h);
+		List<Camera.Size> sizes = parameters.getSupportedPreviewSizes();
+		Camera.Size optimalSize = getOptimalPreviewSize(sizes, getResources().getDisplayMetrics().widthPixels, getResources().getDisplayMetrics().heightPixels);
+
 		parameters.setPreviewSize(optimalSize.width, optimalSize.height);
 
         /*
@@ -117,6 +124,7 @@ public class CameraPreview extends SurfaceView implements
 			// Log.e("DON", mGray.rows() + "");
 			mCamera.addCallbackBuffer(data);
 		}
+
 		mCamera.startPreview();
 	}
 

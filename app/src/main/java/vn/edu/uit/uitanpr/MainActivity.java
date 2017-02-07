@@ -89,6 +89,7 @@ public class MainActivity extends Activity implements OnTaskCompleted {
 
 					mJavaDetector = new CascadeClassifier(
 							mCascadeFile.getAbsolutePath());
+					mJavaDetector.load( mCascadeFile.getAbsolutePath() );
 					if (mJavaDetector.empty()) {
 						Log.e(TAG, "Failed to load cascade classifier");
 						mJavaDetector = null;
@@ -128,7 +129,7 @@ public class MainActivity extends Activity implements OnTaskCompleted {
 		getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 		setContentView(R.layout.activity_main);
 		Boolean checkOpenCV = OpenCVLoader.initAsync(
-                                    OpenCVLoader.OPENCV_VERSION_2_4_9,
+                                    OpenCVLoader.OPENCV_VERSION_3_2_0,
                                     getApplicationContext(),
                                     mLoaderCallback);
 		if(checkOpenCV)
@@ -158,7 +159,7 @@ public class MainActivity extends Activity implements OnTaskCompleted {
 	@Override
 	public void onResume() {
 		super.onResume();
-		OpenCVLoader.initAsync(OpenCVLoader.OPENCV_VERSION_2_4_9,
+		OpenCVLoader.initAsync(OpenCVLoader.OPENCV_VERSION_3_2_0,
                 this, mLoaderCallback);
 	}
 
